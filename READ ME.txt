@@ -1,0 +1,6 @@
+--To Use My 3D Engine|
+                     |
+--Run INSTALLDEPENDINCES.bat
+--Wait for it to say "press any key to continue"
+--Run main.py
+--Enjoy the shitty 3d engine by a 16 year old!
