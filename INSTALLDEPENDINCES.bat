@@ -1,4 +1,5 @@
 @echo off
+cd /d %~dp0
 REM Check if Python is installed
 where python >nul 2>nul
 if %ERRORLEVEL% neq 0 (
