@@ -86,34 +86,33 @@ def main():
     window = init_window(800, 600, "3D Engine - Prism")
     print("Starting main loop...")
 
-    # Vertices for a 3D triangular prism
-    # Each vertex: x, y, z, r, g, b
+    # Prism base triangle vertices (counter-clockwise)
+    # Base 1 (z = -0.5): A, B, C
+    # Base 2 (z = +0.5): D, E, F (corresponding to A, B, C)
     vertices = np.array([
-        # Base 1 (z = -0.5)
-        -0.5, -0.5, -0.5, 1, 0, 0,  # 0: Red
-         0.5, -0.5, -0.5, 0, 1, 0,  # 1: Green
-         0.0,  0.5, -0.5, 0, 0, 1,  # 2: Blue
-        # Base 2 (z = +0.5)
-        -0.5, -0.5,  0.5, 1, 1, 0,  # 3: Yellow
-         0.5, -0.5,  0.5, 0, 1, 1,  # 4: Cyan
-         0.0,  0.5,  0.5, 1, 0, 1,  # 5: Magenta
+        # x,    y,    z,     r, g, b
+        -0.5, -0.5, -0.5,   1, 0, 0,  # 0: A (red)
+         0.5, -0.5, -0.5,   0, 1, 0,  # 1: B (green)
+         0.0,  0.5, -0.5,   0, 0, 1,  # 2: C (blue)
+        -0.5, -0.5,  0.5,   1, 1, 0,  # 3: D (yellow)
+         0.5, -0.5,  0.5,   0, 1, 1,  # 4: E (cyan)
+         0.0,  0.5,  0.5,   1, 0, 1,  # 5: F (magenta)
     ], dtype=np.float32)
 
-    # Indices for the prism faces (2 triangles for bases, 3 rectangles for sides)
     indices = np.array([
-        # Base 1
+        # Base 1 (A, B, C)
         0, 1, 2,
-        # Base 2
+        # Base 2 (D, F, E) (note winding for correct normal)
         3, 5, 4,
-        # Side 1 (rectangle)
-        0, 3, 1,
-        1, 3, 4,
-        # Side 2 (rectangle)
-        1, 4, 2,
-        2, 4, 5,
-        # Side 3 (rectangle)
-        2, 5, 0,
-        0, 5, 3
+        # Side 1 (A, B, E, D)
+        0, 1, 4,
+        0, 4, 3,
+        # Side 2 (B, C, F, E)
+        1, 2, 5,
+        1, 5, 4,
+        # Side 3 (C, A, D, F)
+        2, 0, 3,
+        2, 3, 5
     ], dtype=np.uint32)
 
     vertex_src = """
@@ -157,7 +156,7 @@ def main():
 
     aspect = 800 / 600
     proj = perspective(np.radians(45), aspect, 0.1, 100.0)
-    eye = np.array([2.0, 2.0, 3.0], dtype=np.float32)  # Move camera back and up for a better 3D view
+    eye = np.array([2.0, 2.0, 3.0], dtype=np.float32)
     center = np.array([0.0, 0.0, 0.0], dtype=np.float32)
     up = np.array([0.0, 1.0, 0.0], dtype=np.float32)
     view = look_at(eye, center, up)
@@ -169,8 +168,9 @@ def main():
         glClearColor(0.1, 0.1, 0.1, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glEnable(GL_DEPTH_TEST)
+        glDisable(GL_CULL_FACE)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)  # Solid rendering
         glUseProgram(program)
-        # Animate rotation
         angle = time.time() % (2 * np.pi)
         model = rotation_matrix_y(angle)
         mvp = proj @ view @ model
