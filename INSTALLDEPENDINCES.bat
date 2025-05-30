@@ -1,5 +1,19 @@
 @echo off
 cd /d %~dp0
+
+REM Print current directory and list files
+echo Current directory: %cd%
+echo Files in this directory:
+dir /b
+
+REM Check if requirements.txt exists
+if not exist requirements.txt (
+    echo ERROR: requirements.txt not found in this directory!
+    echo Please make sure requirements.txt is in the same folder as this batch file.
+    pause
+    exit /b
+)
+
 REM Check if Python is installed
 where python >nul 2>nul
 if %ERRORLEVEL% neq 0 (
